@@ -1,16 +1,23 @@
 package com.example.sumer
 
+import android.content.Intent
 import android.os.Bundle
+import android.speech.RecognizerIntent
+import android.speech.SpeechRecognizer
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import com.example.sumer.util.UrlConstants
-import com.example.sumer.util.LawAIWebViewClient
 import com.example.sumer.databinding.ActivityMainBinding
+import com.example.sumer.util.*
+import com.example.sumer.webview.LawAIWebViewClient
 
 class MainActivity : AppCompatActivity() {
-    private val binding : ActivityMainBinding by lazy {
+    public val binding : ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
+    }
+    private val speechRecognizer : SpeechRecognizer by lazy {
+        SpeechRecognizer.createSpeechRecognizer(this)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,8 +25,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         initWebView()
+        initSpeechToTextSetting()
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
@@ -30,6 +37,10 @@ class MainActivity : AppCompatActivity() {
         val webView = binding.webview
         var webViewUrl = StringBuilder(UrlConstants.LAW_AI_BASE_URL)
         when (item.itemId) {
+            R.id.mike_btn -> {
+                webViewUrl.clear(); webViewUrl.append(Constants.PRE_VOICE)
+                speechRecognizer.startListening(intentForRecognizer())
+            }
             R.id.home_btn -> {
                 webViewUrl.append(UrlConstants.HOME)
             }
@@ -45,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun initWebView() {
+    private fun initWebView() {
         val webView = binding.webview
         val webSettings = webView.settings
         webSettings.javaScriptEnabled = true
@@ -53,19 +64,35 @@ class MainActivity : AppCompatActivity() {
         webSettings.useWideViewPort = true
         webSettings.setSupportZoom(true)
         webSettings.builtInZoomControls = true
-
         webView.webViewClient = LawAIWebViewClient(this)
 
-        val setting = getSharedPreferences("setting", 0)
-        val cred = setting.getString("cred", "")
-        if ("" == cred == false) {
+        val cred = getSharedPreferences(Constants.SETTING, 0).getString(Constants.AUTH_CREDENTIAL, null)
+        val requestUrl = UrlConstants.LAW_AI_BASE_URL + UrlConstants.HOME
+
+        if (cred != null) {
             val authHeader = "Basic $cred"
             val headers: MutableMap<String, String> = HashMap()
-            headers["Authorization"] = authHeader
-            //mWebView.loadUrl(myUrl + "/account/login.mo", headers);
-            webView.loadUrl(UrlConstants.LAW_AI_BASE_URL + "/main.mo", headers)
+            headers[Constants.AUTHENTICATION] = authHeader
+            webView.loadUrl(requestUrl, headers)
         } else {
-            webView.loadUrl(UrlConstants.LAW_AI_BASE_URL + "/main.mo")
+            webView.loadUrl(requestUrl)
         }
     }
+
+    private fun initSpeechToTextSetting() {
+        //음성인식 초기화.
+        PermissionCheck(this).requestRecordAudioPermission()
+        speechRecognizer.setRecognitionListener(SpeechRecognitionListener(this))
+    }
+
+    private fun intentForRecognizer() : Intent {
+        val recognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, packageName)
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Constants.KR)
+        recognizerIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+
+        return recognizerIntent
+    }
+
+
 }
