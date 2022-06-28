@@ -8,8 +8,8 @@
         app:showAsAction="always"/>
 
     <item
-        android:id="@+id/person_btn"
-        android:title="PERSON"
+        android:id="@+id/my_page_btn"
+        android:title="MY_PAGE"
         android:icon="@drawable/person_toolbar_btn"
         app:showAsAction="always"/>
     <item
