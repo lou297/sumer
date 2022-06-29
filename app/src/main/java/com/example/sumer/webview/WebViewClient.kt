@@ -12,7 +12,7 @@ import android.webkit.WebViewClient
 import com.example.sumer.util.Constants
 import com.example.sumer.util.Constants.DELETE_CREDENTIAL
 
-class LawAIWebViewClient(val context: Context) : WebViewClient() {
+class WebViewClient(val context: Context) : WebViewClient() {
     override fun shouldInterceptRequest(
         view: WebView?,
         request: WebResourceRequest?
@@ -22,26 +22,24 @@ class LawAIWebViewClient(val context: Context) : WebViewClient() {
         val requestUrl = request?.url.toString()
         if (requestUrl.contains(startHttp)) {
             var subUrl = requestUrl.substring(requestUrl.indexOf(startHttp))
-            subUrl = subUrl.replace(startHttp, "")
+            subUrl = subUrl.replace(startHttp, Constants.EMPTY_STRING)
             if (subUrl.startsWith(Constants.SAVE_CREDENTIAL)) {
-                val cred: String = subUrl.replace("${Constants.SAVE_CREDENTIAL}&${Constants.AUTH_CREDENTIAL}=", "")
+                val cred: String = subUrl.replace("${Constants.SAVE_CREDENTIAL}&${Constants.AUTH_CREDENTIAL}=", Constants.EMPTY_STRING)
                 if (!cred.isEmpty()) {
-                    Log.d("kk", "save credential!")
                     val setting: SharedPreferences = context.getSharedPreferences(Constants.SETTING, 0)
                     val editor = setting.edit()
-                    editor.putString(Constants.AUTH_CREDENTIAL, cred)
-                    editor.commit()
+                    editor.putString(Constants.AUTH_CREDENTIAL, cred).commit()
                 }
-            } else if (subUrl.startsWith(Constants.DELETE_CREDENTIAL)) {
-                Log.d("kk", "delete credential!")
+            }
+            if (subUrl.startsWith(Constants.DELETE_CREDENTIAL)) {
                 val setting: SharedPreferences = context.getSharedPreferences(Constants.SETTING, 0)
                 val editor = setting.edit()
-                editor.remove(Constants.AUTH_CREDENTIAL)
-                editor.commit()
-            } else if (subUrl.startsWith(Constants.OPEN_BROWSER)) {
-                val urlStr: String = subUrl.replace("${Constants.OPEN_BROWSER}&urlStr=", "")
-                val i = Intent(Intent.ACTION_VIEW, Uri.parse(urlStr))
-                context.startActivity(i)
+                editor.remove(Constants.AUTH_CREDENTIAL).commit()
+            }
+            if (subUrl.startsWith(Constants.OPEN_BROWSER)) {
+                val urlStr: String = subUrl.replace("${Constants.OPEN_BROWSER}&urlStr=", Constants.EMPTY_STRING)
+                val intentForWebview = Intent(Intent.ACTION_VIEW, Uri.parse(urlStr))
+                context.startActivity(intentForWebview)
             }
         }
 

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "983260896612",
+    "project_id": "lawbin-fe302",
+    "storage_bucket": "lawbin-fe302.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:983260896612:android:63135fc5e7abafea7e2e71",
+        "android_client_info": {
+          "package_name": "com.example.sumer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "983260896612-ep9q6tjr1hcjesso31bmn7a6nk3hu3dl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2DGokIjrosjMLzYmqNa8VIQNPCFyBUPY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "983260896612-ep9q6tjr1hcjesso31bmn7a6nk3hu3dl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

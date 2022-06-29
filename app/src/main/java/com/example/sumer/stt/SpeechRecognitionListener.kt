@@ -1,13 +1,11 @@
-package com.example.sumer.util
+package com.example.sumer.stt
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.SpeechRecognizer
-import android.util.Log
 import com.example.sumer.MainActivity
+import com.example.sumer.util.Constants
 
 class SpeechRecognitionListener(val context: Context) : RecognitionListener {
     private val mainActivityBinding by lazy {
@@ -34,10 +32,10 @@ class SpeechRecognitionListener(val context: Context) : RecognitionListener {
     }
 
     override fun onResults(results: Bundle?) {
-        val sttRecognizeResult =
+        val speechRecognizeResult =
             results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION) as ArrayList<String>
 
-        mainActivityBinding.webview.loadUrl(Constants.SET_VOICE(sttRecognizeResult[0]))
+        mainActivityBinding.webview.loadUrl(Constants.SET_VOICE(speechRecognizeResult[0]))
     }
 
     override fun onPartialResults(p0: Bundle?) {

@@ -4,13 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.example.sumer.databinding.ActivityMainBinding
+import com.example.sumer.firebase.FirebaseMessagingService
+import com.example.sumer.stt.SpeechRecognitionListener
 import com.example.sumer.util.*
-import com.example.sumer.webview.LawAIWebViewClient
+import com.example.sumer.webview.WebViewClient
 
 class MainActivity : AppCompatActivity() {
     public val binding : ActivityMainBinding by lazy {
@@ -26,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         initWebView()
         initSpeechToTextSetting()
+        initFcm()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -64,15 +66,14 @@ class MainActivity : AppCompatActivity() {
         webSettings.useWideViewPort = true
         webSettings.setSupportZoom(true)
         webSettings.builtInZoomControls = true
-        webView.webViewClient = LawAIWebViewClient(this)
+        webView.webViewClient = WebViewClient(this)
 
         val cred = getSharedPreferences(Constants.SETTING, 0).getString(Constants.AUTH_CREDENTIAL, null)
         val requestUrl = UrlConstants.LAW_AI_BASE_URL + UrlConstants.HOME
 
         if (cred != null) {
-            val authHeader = "Basic $cred"
             val headers: MutableMap<String, String> = HashMap()
-            headers[Constants.AUTHENTICATION] = authHeader
+            headers[Constants.AUTHENTICATION] = "Basic $cred"
             webView.loadUrl(requestUrl, headers)
         } else {
             webView.loadUrl(requestUrl)
@@ -83,6 +84,11 @@ class MainActivity : AppCompatActivity() {
         //음성인식 초기화.
         PermissionCheck(this).requestRecordAudioPermission()
         speechRecognizer.setRecognitionListener(SpeechRecognitionListener(this))
+    }
+
+    private fun initFcm() {
+        val fcm = Intent(applicationContext, FirebaseMessagingService::class.java)
+        startService(fcm)
     }
 
     private fun intentForRecognizer() : Intent {

@@ -18,4 +18,6 @@ object Constants {
 
     //SharedPreference Key
     const val SETTING = "setting"
+
+    const val EMPTY_STRING = ""
 }
